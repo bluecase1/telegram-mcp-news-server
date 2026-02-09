@@ -1,4 +1,9 @@
-# MCP Core
+
+
+# Google Gen AI SDK (New)
+google-genai>=1.0.0
+
+
 mcp>=1.0.0
 
 # HTTP Requests

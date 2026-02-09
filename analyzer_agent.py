@@ -5,6 +5,7 @@ import re
 from typing import Dict, Any, List, Tuple, Union, Optional
 import logging
 import os
+from google import genai
 
 from agent_base import BaseAgent, AgentMessage, NewsItem, TranslatedNews, AnalyzedNews, message_broker
 
@@ -18,6 +19,14 @@ class AnalyzerAgent(BaseAgent):
         # 분석 모델 설정
         self.analysis_model = os.getenv("ANALYSIS_MODEL", "simple")
         self.openai_api_key = os.getenv("OPENAI_API_KEY")
+        self.gemini_api_key = os.getenv("GEMINI_API_KEY")
+
+        self.gemini_client = None
+        if self.gemini_api_key:
+            try:
+                self.gemini_client = genai.Client(api_key=self.gemini_api_key)
+            except Exception as e:
+                self.logger.error(f"Failed to initialize Gemini client: {e}")
         
         # AI 관련 키워드 가중치
         self.ai_keywords_weights = {
@@ -136,9 +145,34 @@ class AnalyzerAgent(BaseAgent):
         """뉴스 요약 생성 (10줄 이내)"""
         if self.analysis_model == "openai" and self.openai_api_key:
             return await self.generate_summary_with_gpt(title, content)
+        elif self.analysis_model == "gemini" and self.gemini_client:
+            return await self.generate_summary_with_gemini(title, content)
         else:
             return self.generate_simple_summary(title, content)
     
+    async def generate_summary_with_gemini(self, title: str, content: str) -> str:
+        """Gemini를 사용한 요약 생성"""
+        try:
+            prompt = f"""
+            다음 뉴스 기사를 10줄 이내로 요약해주세요. 핵심 내용에 집중하고, AI 기술 관련 정보를 강조해주세요.
+            
+            제목: {title}
+            내용: {content[:8000]}  # Gemini는 컨텍스트 윈도우가 더 큼
+            
+            요약:
+            """
+            
+            response = await self.gemini_client.aio.models.generate_content(
+                model='gemini-2.0-flash',
+                contents=prompt
+            )
+            summary = response.text.strip()
+            return self.limit_lines(summary, self.max_summary_lines)
+                        
+        except Exception as e:
+            self.logger.error(f"Gemini summary error: {e}")
+            return self.generate_simple_summary(title, content)
+
     async def generate_summary_with_gpt(self, title: str, content: str) -> str:
         """GPT를 사용한 요약 생성"""
         try:
@@ -270,6 +304,7 @@ class AnalyzerAgent(BaseAgent):
             "model": self.analysis_model,
             "max_summary_lines": self.max_summary_lines,
             "openai_configured": bool(self.openai_api_key),
+            "gemini_configured": bool(self.gemini_client),
             "ai_keywords_count": len(self.ai_keywords_weights)
         }
         
