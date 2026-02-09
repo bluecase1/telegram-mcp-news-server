@@ -122,13 +122,17 @@ class TranslatorAgent(BaseAgent):
     
     async def translate_text(self, text: str, source_lang: str, target_lang: str) -> str:
         """텍스트 번역"""
-        if self.translation_provider == "google":
-            return await self.translate_with_google(text, source_lang, target_lang)
-        elif self.translation_provider == "papago":
-            return await self.translate_with_papago(text, source_lang, target_lang)
-        else:
-            # 기본 번역 (모의)
-            return f"[{source_lang}->{target_lang}] {text}"
+        try:
+            if self.translation_provider == "google":
+                return await self.translate_with_google(text, source_lang, target_lang)
+            elif self.translation_provider == "papago":
+                return await self.translate_with_papago(text, source_lang, target_lang)
+            else:
+                # 기본 번역 (모의)
+                return f"[{source_lang}->{target_lang}] {text}"
+        except Exception as e:
+            self.logger.error(f"Translation logic error: {e}")
+            return f"[Translation Error] {text}"
     
     async def translate_with_google(self, text: str, source_lang: str, target_lang: str) -> str:
         """Google Translate API 사용"""
@@ -172,8 +176,8 @@ class TranslatorAgent(BaseAgent):
             
             headers = {
                 "X-Naver-Client-Id": self.papago_client_id,
-                "X-Naver-Client-Secret": self.papago_client_secret,
-                "Content-Type": "application/x-www-form-urlencoded; charset=UTF-8"
+                "X-Naver-Client-Secret": self.papago_client_secret
+                # Content-Type is handled by aiohttp data= param usually
             }
             
             # Papago 언어 코드 변환

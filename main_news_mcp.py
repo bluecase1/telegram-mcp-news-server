@@ -517,6 +517,8 @@ async def main():
             )
     
     except Exception as e:
+        import traceback
+        traceback.print_exc()
         print(f"Server error: {e}", file=sys.stderr)
         sys.exit(1)
 

@@ -64,6 +64,9 @@ class TelegramSenderAgent(BaseAgent):
     def initialize_telegram(self):
         """텔레그램 초기화"""
         try:
+            if not self.bot_token:
+                raise ValueError("Telegram bot token is missing")
+                
             self.bot = Bot(token=self.bot_token)
             self.application = Application.builder().token(self.bot_token).build()
             
@@ -73,6 +76,9 @@ class TelegramSenderAgent(BaseAgent):
             self.logger.info("Telegram bot initialized successfully")
         except Exception as e:
             self.logger.error(f"Failed to initialize Telegram bot: {e}")
+            # Do not re-raise, allow agent to start without telegram
+            self.bot = None
+            self.application = None
     
     def setup_handlers(self):
         """텔레그램 핸들러 설정"""
