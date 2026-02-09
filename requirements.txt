@@ -1,4 +1,7 @@
-# MCP Core
+
+# Google Gemini
+google-generativeai>=0.3.0
+
 mcp>=1.0.0
 
 # HTTP Requests
