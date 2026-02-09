@@ -502,6 +502,8 @@ async def main():
         mcp_server = NewsAlertMCPServer(settings)
         
         # MCP 서버 실행
+        from mcp.server.lowlevel.server import NotificationOptions
+
         async with stdio_server() as (read_stream, write_stream):
             await mcp_server.server.run(
                 read_stream,
@@ -510,8 +512,8 @@ async def main():
                     server_name="news-alert-mcp-server",
                     server_version="1.0.0",
                     capabilities=mcp_server.server.get_capabilities(
-                        notification_options=None,
-                        experimental_capabilities=None
+                        notification_options=NotificationOptions(),
+                        experimental_capabilities={}
                     )
                 )
             )
