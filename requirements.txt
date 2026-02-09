@@ -1,6 +1,8 @@
 
-# Google Gemini
-google-generativeai>=0.3.0
+
+# Google Gen AI SDK (New)
+google-genai>=1.0.0
+
 
 mcp>=1.0.0
 

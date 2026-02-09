@@ -3,7 +3,10 @@ import os
 import sys
 from typing import Any, Dict, List
 
+# 환경 변수 로드 (다른 모듈 임포트 전에 실행)
 from dotenv import load_dotenv
+load_dotenv()
+
 from pydantic import BaseModel
 from mcp.server import Server
 from mcp.server.models import InitializationOptions
@@ -23,8 +26,8 @@ from categorizer_agent import categorizer_agent
 from telegram_sender_agent import telegram_sender_agent
 from mail_sender_agent import mail_sender_agent
 
-# 환경 변수 로드
-load_dotenv()
+# 환경 변수 로드 (Moved to top)
+# load_dotenv()
 
 
 class NewsMCPSettings(BaseModel):
