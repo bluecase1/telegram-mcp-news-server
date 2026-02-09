@@ -269,13 +269,15 @@ AI 뉴스 알림 서비스
         analyzed_news = categorized_news.analyzed_news
         news = analyzed_news.news
         
-        # 제목
+        # 제목 및 URL
         if isinstance(news, TranslatedNews):
             title = news.translated_title
             content = news.translated_content
+            url = news.original.url
         else:
             title = news.title
             content = news.content
+            url = news.url
         
         # 템플릿 데이터
         template_data = {
@@ -285,7 +287,7 @@ AI 뉴스 알림 서비스
             "summary": analyzed_news.summary,
             "key_points": analyzed_news.key_points,
             "tags": categorized_news.tags,
-            "url": news.url,
+            "url": url,
             "importance": analyzed_news.importance_score,
             "ai_relevance": analyzed_news.ai_relevance,
             "date": datetime.now().strftime("%Y년 %m월 %d일")
@@ -315,8 +317,10 @@ AI 뉴스 알림 서비스
             
             if isinstance(news, TranslatedNews):
                 title = news.translated_title
+                url = news.original.url
             else:
                 title = news.title
+                url = news.url
             
             template_data = {
                 "title": title,
@@ -325,7 +329,7 @@ AI 뉴스 알림 서비스
                 "summary": analyzed_news.summary,
                 "key_points": analyzed_news.key_points,
                 "tags": categorized_news.tags,
-                "url": news.url,
+                "url": url,
                 "importance": analyzed_news.importance_score,
                 "ai_relevance": analyzed_news.ai_relevance
             }

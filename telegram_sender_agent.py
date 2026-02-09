@@ -177,11 +177,13 @@ class TelegramSenderAgent(BaseAgent):
         analyzed_news = categorized_news.analyzed_news
         news = analyzed_news.news
         
-        # 제목
+        # 제목 및 URL
         if isinstance(news, TranslatedNews):
             title = news.translated_title
+            url = news.original.url
         else:
             title = news.title
+            url = news.url
         
         # 요약
         summary = analyzed_news.summary
@@ -212,7 +214,7 @@ class TelegramSenderAgent(BaseAgent):
         
         # 링크 추가
         message_parts.append("")
-        message_parts.append(f"🔗 [원문 기사]({news.url})")
+        message_parts.append(f"🔗 [원문 기사]({url})")
         message_parts.append("")
         message_parts.append(f"📊 중요도: {analyzed_news.importance_score:.2f} | AI 관련성: {analyzed_news.ai_relevance:.2f}")
         message_parts.append("")
